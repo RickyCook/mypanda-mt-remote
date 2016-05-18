@@ -7,7 +7,6 @@ pe/
 __pycache__/
 .cache/
 
-/docs-build
 /python_env
 
 .DS_Store
