@@ -1,0 +1,1196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &mdash; MT Remote  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MT Remote  documentation" href="#" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-mt_remote">
+<span id="api"></span><h1>API<a class="headerlink" href="#module-mt_remote" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-mt_remote"></span><p>MetaTrader remote interface</p>
+<div class="section" id="remote-server">
+<h2>Remote Server<a class="headerlink" href="#remote-server" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="csv-event-source">
+<h2>CSV Event Source<a class="headerlink" href="#csv-event-source" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.CsvEventSource">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">CsvEventSource</code><span class="sig-paren">(</span><em>path=None</em>, <em>handle=None</em>, <em>balance=0</em>, <em>cols=('start_ts'</em>, <em>'open_'</em>, <em>'high'</em>, <em>'low'</em>, <em>'close'</em>, <em>'volume')</em>, <em>**reader_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.CsvEventSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>An event source that gets <code class="docutils literal"><span class="pre">Bar</span></code> data from a CSV file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) &#8211; Path to the CSV file to load</li>
+<li><strong>handle</strong> &#8211; File-like handle object to read from</li>
+<li><strong>balance</strong> (<em>float</em>) &#8211; Initial account balance</li>
+<li><strong>cols</strong> (<em>tuple, list</em>) &#8211; Attribute names for the columns in the CSV</li>
+<li><strong>reader_kwargs</strong> (<em>dict</em>) &#8211; Additional kwargs for the <code class="docutils literal"><span class="pre">csv.reader</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; If both <code class="docutils literal"><span class="pre">path</span></code>, and <code class="docutils literal"><span class="pre">handle</span></code> are given</li>
+<li><strong>ValueError</strong> &#8211; If neither <code class="docutils literal"><span class="pre">path</span></code>, nor <code class="docutils literal"><span class="pre">handle</span></code> are given</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<blockquote>
+<div><p>Setup:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.order</span> <span class="k">import</span> <span class="n">Order</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_1</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,12,9,11,1000</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,11,13,10,12,1001</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:20:00,12,13,11,13,1002</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_1</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_1</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source_1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">&lt;Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00:00...&gt;</span>
+<span class="go">&lt;Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10:00...&gt;</span>
+<span class="go">&lt;Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20:00...&gt;</span>
+</pre></div>
+</div>
+<p>Trading example:</p>
+<blockquote>
+<div><p>Successful buy:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,,,20</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,20,,,30</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,30,,,40</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Trade on the first bar, close on the last, print balance each new
+tick and bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_trade</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bar balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">tick_trade_handler</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tick balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Trade decisions are made on the tick, or bar AFTER you place them:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">Bar balance: 1000.0</span>
+<span class="go">Tick balance: 960.0</span>
+<span class="go">Bar balance: 960.0</span>
+<span class="go">Tick balance: 960.0</span>
+<span class="go">Bar balance: 960.0</span>
+<span class="go">Tick balance: 1040.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Successful sell:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,40,,,30</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,30,,,20</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,20,,,10</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Trade on the first bar, close on the last, print balance each new
+tick and bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_trade</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bar balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">tick_trade_handler</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tick balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">Bar balance: 1000.0</span>
+<span class="go">Tick balance: 940.0</span>
+<span class="go">Bar balance: 940.0</span>
+<span class="go">Tick balance: 940.0</span>
+<span class="go">Bar balance: 940.0</span>
+<span class="go">Tick balance: 1040.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Unsuccessful buy:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,40,,,30</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,30,,,20</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,20,,,10</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Trade on the first bar, close on the last, print balance each new
+tick and bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_trade</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bar balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">tick_trade_handler</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tick balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">Bar balance: 1000.0</span>
+<span class="go">Tick balance: 940.0</span>
+<span class="go">Bar balance: 940.0</span>
+<span class="go">Tick balance: 940.0</span>
+<span class="go">Bar balance: 940.0</span>
+<span class="go">Tick balance: 960.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Unsuccessful sell:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,,,20</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,20,,,30</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,30,,,40</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Trade on the first bar, close on the last, print balance each new
+tick and bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_trade</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bar balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">tick_trade_handler</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tick balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">Bar balance: 1000.0</span>
+<span class="go">Tick balance: 960.0</span>
+<span class="go">Bar balance: 960.0</span>
+<span class="go">Tick balance: 960.0</span>
+<span class="go">Bar balance: 960.0</span>
+<span class="go">Tick balance: 960.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Switch signal:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,,,20</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,20,,,30</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:10:00,30,,,40</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Trade on the first bar, close on the last, print balance each new
+tick and bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_trade</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">bar</span><span class="o">.</span><span class="n">close</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">source_trade</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bar balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_trade</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">tick_trade_handler</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tick balance:&quot;</span><span class="p">,</span> <span class="n">source_trade</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_trade</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go">Bar balance: 1000.0</span>
+<span class="go">Tick balance: 960.0</span>
+<span class="go">Bar balance: 960.0</span>
+<span class="go">Tick balance: 920.0</span>
+<span class="go">Bar balance: 920.0</span>
+<span class="go">Tick balance: 1000.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>For more info on how orders are fulfilled in <code class="docutils literal"><span class="pre">CsvEventSource</span></code>, see
+<code class="docutils literal"><span class="pre">CsvEventSource._fulfill_order</span></code> docs.</p>
+</div></blockquote>
+<p>Can&#8217;t place an order without balance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_bal</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source_bal</span><span class="o">.</span><span class="n">_add_tick</span><span class="p">(</span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source_bal</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">Order</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rejected:&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source_bal</span><span class="o">.</span><span class="n">_add_tick</span><span class="p">(</span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">Rejected: Account balance too low</span>
+</pre></div>
+</div>
+<p>Bar creation rules are applied:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_2</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,9,12,11,1000</span>
+<span class="gp">... </span><span class="s1">&#39;&#39;&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@source_2</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_2</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source_2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">High (9) is less than low (12)</span>
+</pre></div>
+</div>
+<p>Exceptions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">CsvEventSource</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Must give only path, or handle</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">CsvEventSource</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Must give either path, or handle</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="method">
+<dt id="mt_remote.CsvEventSource._fulfill_order">
+<code class="descname">_fulfill_order</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.CsvEventSource._fulfill_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the internal order ledger, and balance</p>
+<p>Examples:</p>
+<blockquote>
+<div><p>Setup:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.order</span> <span class="k">import</span> <span class="n">Order</span>
+</pre></div>
+</div>
+<p>Order takes <code class="docutils literal"><span class="pre">volume</span> <span class="pre">*</span> <span class="pre">price</span></code> from balance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">970.0</span>
+</pre></div>
+</div>
+<p>Closing a positive buy order calculates new balance correctly:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">1030.0</span>
+</pre></div>
+</div>
+<p>Order takes <code class="docutils literal"><span class="pre">volume</span> <span class="pre">*</span> <span class="pre">price</span></code> from balance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+</pre></div>
+</div>
+<p>Closing a positive sell order calculates new balance correctly:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">1030.0</span>
+</pre></div>
+</div>
+<p>Buy orders that lose also work:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">970.0</span>
+</pre></div>
+</div>
+<p>Sell orders that lose also work:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">())</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">970.0</span>
+</pre></div>
+</div>
+<p>Doesn&#8217;t fail if there&#8217;s no order:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Rejects if no balance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_price</span> <span class="o">=</span> <span class="mf">20.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">Order</span><span class="p">(</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rejected:&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_fulfill_order</span><span class="p">()</span>
+<span class="go">Rejected: Account balance too low</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="promise">
+<h2>Promise<a class="headerlink" href="#promise" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Promise">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Promise</code><a class="headerlink" href="#mt_remote.Promise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roughly mimick the promise pattern for async actions</p>
+<dl class="method">
+<dt id="mt_remote.Promise.accept">
+<code class="descname">accept</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully complete</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.always">
+<code class="descname">always</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.always" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add success handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;then&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">then test</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;catch&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">catch test</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.catch">
+<code class="descname">catch</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.catch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add failure handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.reject">
+<code class="descname">reject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.reject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error trying to complete</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.then">
+<code class="descname">then</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.then" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add success handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="order">
+<h2>Order<a class="headerlink" href="#order" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Order">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Order</code><span class="sig-paren">(</span><em>signal=None</em>, <em>volume=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic order to place with MT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>signal</strong> (<a class="reference internal" href="#mt_remote.OrderSignal" title="mt_remote.OrderSignal"><em>OrderSignal</em></a>) &#8211; type of order to place</li>
+<li><strong>volume</strong> (<em>int</em>) &#8211; amount the order should trade</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; If <code class="docutils literal"><span class="pre">signal</span></code> isn&#8217;t out, and volume isn&#8217;t set</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span>
+<span class="go">&lt;Order: signal=out&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+<span class="go">&lt;Order: signal=out&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Order: volume=1, signal=buy&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Order: volume=1, signal=sell&gt;</span>
+</pre></div>
+</div>
+<p>Exceptions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
+</pre></div>
+</div>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="mt_remote.Order.signal">
+<code class="descname">signal</code><a class="headerlink" href="#mt_remote.Order.signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of order to place. In case this is set to <code class="docutils literal"><span class="pre">None</span></code>, this
+will always default to <code class="docutils literal"><span class="pre">OrderSignal.out</span></code></p>
+<p>Examples:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.buy...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.sell...&gt;</span>
+</pre></div>
+</div>
+<p>When signal is <code class="docutils literal"><span class="pre">None</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="order-signal">
+<h2>Order Signal<a class="headerlink" href="#order-signal" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.OrderSignal">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">OrderSignal</code><a class="headerlink" href="#mt_remote.OrderSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order signal to send to MT for fulfillment</p>
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.buy">
+<code class="descname">buy</code><em class="property"> = &lt;OrderSignal.buy: 'buy'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.buy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.out">
+<code class="descname">out</code><em class="property"> = &lt;OrderSignal.out: 'out'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.out" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.sell">
+<code class="descname">sell</code><em class="property"> = &lt;OrderSignal.sell: 'sell'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.sell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="bar">
+<h2>Bar<a class="headerlink" href="#bar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Bar">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Bar</code><span class="sig-paren">(</span><em>start_ts=None</em>, <em>period=None</em>, <em>open_=None</em>, <em>high=None</em>, <em>low=None</em>, <em>close=None</em>, <em>volume=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instrument bar with O/H/L/C/V, period, and start time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start_ts</strong> (<em>datetime.datetime, str</em>) &#8211; Time that the bar started at, formatted in ISO8601</li>
+<li><strong>period</strong> (<em>str, tuple</em>) &#8211; Period of the bar (eg &#8216;1m&#8217;, &#8216;4h&#8217;)</li>
+<li><strong>open</strong> (<em>float, str</em>) &#8211; Price of the instrument at bar open</li>
+<li><strong>high</strong> (<em>float, str</em>) &#8211; Maximum price of the instrument over the bar</li>
+<li><strong>low</strong> (<em>float, str</em>) &#8211; Minimum price of the instrument over the bar</li>
+<li><strong>close</strong> (<em>float, str</em>) &#8211; Price of the instrument at bar close</li>
+<li><strong>volume</strong> (<em>int, str</em>) &#8211; Trade volume of the instrument over the bar</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; If <code class="docutils literal"><span class="pre">high</span></code> is less than <code class="docutils literal"><span class="pre">low</span></code></li>
+<li><strong>ValueError</strong> &#8211; If O/H/L/C/V can&#8217;t be parsed as numbers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Bar: high=1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Bar: low=1.0&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="go">&lt;Bar: high=1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="go">&lt;Bar: low=1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="s1">&#39;12&#39;</span><span class="p">)</span>
+<span class="go">&lt;Bar: open=12.0&gt;</span>
+</pre></div>
+</div>
+<p>Start timestamp is parsed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span>
+<span class="go">datetime.datetime(2016, 1, 1, 0, 0, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+<p>Blanks are considered None:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">high</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">low</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+</pre></div>
+</div>
+<p>Exceptions:</p>
+<blockquote>
+<div><p>High and low are checked for sanity:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">High (5) is less than low (10)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="s1">&#39;10&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">High (5) is less than low (10)</span>
+</pre></div>
+</div>
+<p>Errors occur when OHLCV aren&#8217;t numbers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">could not convert string to float: &#39;test&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div></blockquote>
+<dl class="attribute">
+<dt id="mt_remote.Bar.oh_change">
+<code class="descname">oh_change</code><a class="headerlink" href="#mt_remote.Bar.oh_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change between the open and the close</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">oh_change</span>
+<span class="go">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">oh_change</span>
+<span class="go">-5.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.Bar.oh_delta">
+<code class="descname">oh_delta</code><a class="headerlink" href="#mt_remote.Bar.oh_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delta (absolute change) between the open and the close</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">oh_delta</span>
+<span class="go">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">open_</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">oh_delta</span>
+<span class="go">5.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.Bar.period">
+<code class="descname">period</code><a class="headerlink" href="#mt_remote.Bar.period" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time period of this <code class="docutils literal"><span class="pre">Bar</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return tuple:</th><td class="field-body"><p class="first">of the parsed duration value, and the <code class="docutils literal"><span class="pre">BarPeriod</span></code>
+representing what the unit of the value is</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return None:</th><td class="field-body"><p class="first">if period is unset, or <code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; Period string is unparseable</li>
+<li><strong>TypeError</strong> &#8211; Unknown value type</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<blockquote>
+<div><p>Seconds:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;1s&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(1, &lt;BarPeriod.seconds...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;30 seconds&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(30, &lt;BarPeriod.seconds...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;15sec&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(15, &lt;BarPeriod.seconds...&gt;)</span>
+</pre></div>
+</div>
+<p>Minutes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;30m&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(30, &lt;BarPeriod.minutes...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;30minutes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(30, &lt;BarPeriod.minutes...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;  15      minutes   &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(15, &lt;BarPeriod.minutes...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;15MINutes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(15, &lt;BarPeriod.minutes...&gt;)</span>
+</pre></div>
+</div>
+<p>Hours:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4hours&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.hours...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4h&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.hours...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4hrs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.hours...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4hr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.hours...&gt;)</span>
+</pre></div>
+</div>
+<p>Days:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;7day&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(7, &lt;BarPeriod.days...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;7days&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(7, &lt;BarPeriod.days...&gt;)</span>
+</pre></div>
+</div>
+<p>Weeks:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.weeks...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4week&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.weeks...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4weeks&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.weeks...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;4wks&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(4, &lt;BarPeriod.weeks...&gt;)</span>
+</pre></div>
+</div>
+<p>Months:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2months&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(2, &lt;BarPeriod.months...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2mn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(2, &lt;BarPeriod.months...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2mns&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(2, &lt;BarPeriod.months...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2mnth&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(2, &lt;BarPeriod.months...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2mnths&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(2, &lt;BarPeriod.months...&gt;)</span>
+</pre></div>
+</div>
+<p>Years:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;5years&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(5, &lt;BarPeriod.years...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;5yrs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(5, &lt;BarPeriod.years...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;5yr&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(5, &lt;BarPeriod.years...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;5y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(5, &lt;BarPeriod.years...&gt;)</span>
+</pre></div>
+</div>
+<p>Pre-parsed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">BarPeriod</span><span class="o">.</span><span class="n">seconds</span><span class="p">))</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(1, &lt;BarPeriod.seconds...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">BarPeriod</span><span class="o">.</span><span class="n">seconds</span><span class="p">])</span><span class="o">.</span><span class="n">period</span>
+<span class="go">(1, &lt;BarPeriod.seconds...&gt;)</span>
+</pre></div>
+</div>
+<p>Incorrect pre-parsed length:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">BarPeriod</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">period</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Must have exactly 2 elements in period</span>
+</pre></div>
+</div>
+<p>Pre-parsed non-base-10 string:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;0xff&#39;</span><span class="p">,</span> <span class="n">BarPeriod</span><span class="o">.</span><span class="n">seconds</span><span class="p">))</span><span class="o">.</span><span class="n">period</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">invalid literal for int() with base 10: &#39;0xff&#39;</span>
+</pre></div>
+</div>
+<p>Incorrect type for pre-parsed unit:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;second&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">period</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">Second period tuple element must be a BarPeriod value</span>
+</pre></div>
+</div>
+<p>Unparsable values:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;fake&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Couldn&#39;t parse period &#39;fake&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;1fake&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Unknown time unit &#39;fake&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">Unknown period value type &#39;int&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.Bar.size">
+<code class="descname">size</code><a class="headerlink" href="#mt_remote.Bar.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Difference between the high, and the low</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+<span class="go">3.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.Bar.start_ts">
+<code class="descname">start_ts</code><a class="headerlink" href="#mt_remote.Bar.start_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time that the bar started at</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>None, datetime.datetime, str</em>) &#8211; Pre-parsed, or ISO8601 string date</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>iso8601.iso8601.ParseError</strong> &#8211; If unparseable date string</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01 12:22:22&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span>
+<span class="go">datetime.datetime(2016, 1, 1, 12, 22, 22, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="bar-period">
+<h2>Bar Period<a class="headerlink" href="#bar-period" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.BarPeriod">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">BarPeriod</code><a class="headerlink" href="#mt_remote.BarPeriod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Units for a <code class="docutils literal"><span class="pre">Bar</span></code> period</p>
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.days">
+<code class="descname">days</code><em class="property"> = &lt;BarPeriod.days: 'days'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.days" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.hours">
+<code class="descname">hours</code><em class="property"> = &lt;BarPeriod.hours: 'hours'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.hours" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.minutes">
+<code class="descname">minutes</code><em class="property"> = &lt;BarPeriod.minutes: 'minutes'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.minutes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.months">
+<code class="descname">months</code><em class="property"> = &lt;BarPeriod.months: 'months'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.months" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.seconds">
+<code class="descname">seconds</code><em class="property"> = &lt;BarPeriod.seconds: 'seconds'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.seconds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.weeks">
+<code class="descname">weeks</code><em class="property"> = &lt;BarPeriod.weeks: 'weeks'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.weeks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.years">
+<code class="descname">years</code><em class="property"> = &lt;BarPeriod.years: 'years'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.years" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tick">
+<h2>Tick<a class="headerlink" href="#tick" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Tick">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Tick</code><span class="sig-paren">(</span><em>tick_ts=None</em>, <em>price=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Tick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instrument tick, with price at a point in time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tick_ts</strong> (<em>datetime.datetime, str</em>) &#8211; Time that the tick occurred at, formatted in ISO8601</li>
+<li><strong>price</strong> (<em>float, str</em>) &#8211; Price of the instrument when the tick occurred</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; If price can&#8217;t be parsed as numbers</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="go">&lt;Tick: price=15.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+<span class="go">&lt;Tick: price=1.0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="s1">&#39;12&#39;</span><span class="p">)</span>
+<span class="go">&lt;Tick: price=12.0&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">could not convert string to float: &#39;test&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">tick_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tick_ts</span>
+<span class="go">datetime.datetime(2016, 1, 1, 0, 0, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="mt_remote.Tick.tick_ts">
+<code class="descname">tick_ts</code><a class="headerlink" href="#mt_remote.Tick.tick_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time that the tick occurred at</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>None, datetime.datetime, str</em>) &#8211; Pre-parsed, or ISO8601 string date</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>iso8601.iso8601.ParseError</strong> &#8211; If unparseable date string</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">tick_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01 12:22:22&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tick_ts</span>
+<span class="go">datetime.datetime(2016, 1, 1, 12, 22, 22, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API</a><ul>
+<li><a class="reference internal" href="#remote-server">Remote Server</a></li>
+<li><a class="reference internal" href="#csv-event-source">CSV Event Source</a></li>
+<li><a class="reference internal" href="#promise">Promise</a></li>
+<li><a class="reference internal" href="#order">Order</a></li>
+<li><a class="reference internal" href="#order-signal">Order Signal</a></li>
+<li><a class="reference internal" href="#bar">Bar</a></li>
+<li><a class="reference internal" href="#bar-period">Bar Period</a></li>
+<li><a class="reference internal" href="#tick">Tick</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
