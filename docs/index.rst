@@ -4,24 +4,23 @@ API
 .. module:: mt_remote
 .. automodule:: mt_remote
 
-Remote Server
--------------
-
-.. autoclass:: MtEventSource
-   :members:
-
 CSV Event Source
 ----------------
 
 .. autoclass:: CsvEventSource
    :members: _fulfill_order
 
-Promise
--------
+Bar
+---
 
-.. autoclass:: Promise
+.. autoclass:: Bar
    :members:
 
+Tick
+----
+
+.. autoclass:: Tick
+   :members:
 
 Order
 -----
@@ -37,12 +36,6 @@ Order Signal
    :undoc-members:
    :inherited-members:
 
-Bar
----
-
-.. autoclass:: Bar
-   :members:
-
 Bar Period
 ----------
 
@@ -51,8 +44,10 @@ Bar Period
    :undoc-members:
    :inherited-members:
 
-Tick
-----
+Promise
+-------
 
-.. autoclass:: Tick
+.. autoclass:: Promise
    :members:
+
+
