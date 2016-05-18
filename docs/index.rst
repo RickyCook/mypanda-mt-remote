@@ -49,5 +49,3 @@ Promise
 
 .. autoclass:: Promise
    :members:
-
-
