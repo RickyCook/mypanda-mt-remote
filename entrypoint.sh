@@ -23,7 +23,8 @@ function publish {
   git merge -m "Merge branch '$current_branch' into gh-pages" "$current_branch"
   doc
   rm -rf 'docs-build/.doctrees'
-  git commit -m 'Update docs' docs-build || true
+  git add --all docs-build
+  git commit -m 'Update docs' || true
   git push -u origin gh-pages
   git checkout "$current_branch"
   cd -
