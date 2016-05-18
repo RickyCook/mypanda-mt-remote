@@ -228,18 +228,21 @@ class CsvEventSource(BaseEventSource):
         >>> from io import StringIO
         >>> from .order import Order
 
-      >>> source_1 = CsvEventSource(handle=StringIO('''
-      ... 2016-01-01T12:00:00,10,12,9,11,1000
-      ... 2016-01-01T12:10:00,11,13,10,12,1001
-      ... 2016-01-01T12:20:00,12,13,11,13,1002
-      ... '''))
-      >>> @source_1.on_bar
-      ... def bar_handler_1(bar):
-      ...     print(bar)
-      >>> source_1.start()
-      <Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00:00...>
-      <Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10:00...>
-      <Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20:00...>
+      The ``on_bar`` decorator marks a function to receive every bar in the
+      CSV file:
+
+        >>> source_1 = CsvEventSource(handle=StringIO('''
+        ... 2016-01-01T12:00:00,10,12,9,11,1000
+        ... 2016-01-01T12:10:00,11,13,10,12,1001
+        ... 2016-01-01T12:20:00,12,13,11,13,1002
+        ... '''))
+        >>> @source_1.on_bar
+        ... def bar_handler_1(bar):
+        ...     print(bar)
+        >>> source_1.start()
+        <Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00...>
+        <Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10...>
+        <Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20...>
 
       Trading example:
 
