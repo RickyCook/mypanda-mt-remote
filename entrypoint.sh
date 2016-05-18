@@ -15,6 +15,19 @@ function doc {
   PYTHONPATH="$THIS_DIR:$PYTHONPATH" \
       sphinx-build "$THIS_DIR/docs" "$THIS_DIR/docs-build"
 }
+function publish {
+  cd "$THIS_DIR"
+  current_branch="$(git rev-parse --abbrev-ref HEAD)"
+  git checkout 'gh-pages'
+  git pull origin 'gh-pages'
+  git merge -m "Merge branch '$current_branch' into gh-pages" "$current_branch"
+  doc
+  rm -rf 'docs-build/.doctrees'
+  git commit -m 'Update docs' docs-build || true
+  git push -u origin gh-pages
+  git checkout "$current_branch"
+  cd -
+}
 function pep8_ {
   pep8 "mt_remote"
 }
