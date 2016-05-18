@@ -78,14 +78,13 @@
                 <!-- Local TOC -->
                 <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">API</a><ul>
-<li><a class="reference internal" href="#remote-server">Remote Server</a></li>
 <li><a class="reference internal" href="#csv-event-source">CSV Event Source</a></li>
-<li><a class="reference internal" href="#promise">Promise</a></li>
+<li><a class="reference internal" href="#bar">Bar</a></li>
+<li><a class="reference internal" href="#tick">Tick</a></li>
 <li><a class="reference internal" href="#order">Order</a></li>
 <li><a class="reference internal" href="#order-signal">Order Signal</a></li>
-<li><a class="reference internal" href="#bar">Bar</a></li>
 <li><a class="reference internal" href="#bar-period">Bar Period</a></li>
-<li><a class="reference internal" href="#tick">Tick</a></li>
+<li><a class="reference internal" href="#promise">Promise</a></li>
 </ul>
 </li>
 </ul>
@@ -135,9 +134,6 @@
   <div class="section" id="module-mt_remote">
 <span id="api"></span><h1>API<a class="headerlink" href="#module-mt_remote" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-mt_remote"></span><p>MetaTrader remote interface</p>
-<div class="section" id="remote-server">
-<h2>Remote Server<a class="headerlink" href="#remote-server" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="csv-event-source">
 <h2>CSV Event Source<a class="headerlink" href="#csv-event-source" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -522,297 +518,6 @@ tick and bar:</p>
 </dd></dl>
 
 </div>
-<div class="section" id="promise">
-<h2>Promise<a class="headerlink" href="#promise" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="mt_remote.Promise">
-<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Promise</code><a class="headerlink" href="#mt_remote.Promise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Roughly mimick the promise pattern for async actions</p>
-<dl class="method">
-<dt id="mt_remote.Promise.accept">
-<code class="descname">accept</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.accept" title="Permalink to this definition">¶</a></dt>
-<dd><p>Successfully complete</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
-</tr>
-</tbody>
-</table>
-<p>Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="mt_remote.Promise.always">
-<code class="descname">always</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.always" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add success handler</p>
-<p>Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;then&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
-<span class="go">then test</span>
-<span class="go">1 test</span>
-<span class="go">2 test</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="go">3 test</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;catch&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
-<span class="go">catch test</span>
-<span class="go">1 test</span>
-<span class="go">2 test</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="go">3 test</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="mt_remote.Promise.catch">
-<code class="descname">catch</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.catch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add failure handler</p>
-<p>Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
-<span class="go">1 test</span>
-<span class="go">2 test</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="go">3 test</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="mt_remote.Promise.reject">
-<code class="descname">reject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.reject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Error trying to complete</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
-</tr>
-</tbody>
-</table>
-<p>Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="mt_remote.Promise.then">
-<code class="descname">then</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.then" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add success handler</p>
-<p>Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
-<span class="go">1 test</span>
-<span class="go">2 test</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="go">3 test</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="order">
-<h2>Order<a class="headerlink" href="#order" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="mt_remote.Order">
-<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Order</code><span class="sig-paren">(</span><em>signal=None</em>, <em>volume=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Basic order to place with MT</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>signal</strong> (<a class="reference internal" href="#mt_remote.OrderSignal" title="mt_remote.OrderSignal"><em>OrderSignal</em></a>) &#8211; type of order to place</li>
-<li><strong>volume</strong> (<em>int</em>) &#8211; amount the order should trade</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; If <code class="docutils literal"><span class="pre">signal</span></code> isn&#8217;t out, and volume isn&#8217;t set</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span>
-<span class="go">&lt;Order: signal=out&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
-<span class="go">&lt;Order: signal=out&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="go">&lt;Order: volume=1, signal=buy&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="go">&lt;Order: volume=1, signal=sell&gt;</span>
-</pre></div>
-</div>
-<p>Exceptions:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
-</pre></div>
-</div>
-<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-<span class="c">...</span>
-<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="attribute">
-<dt id="mt_remote.Order.signal">
-<code class="descname">signal</code><a class="headerlink" href="#mt_remote.Order.signal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Type of order to place. In case this is set to <code class="docutils literal"><span class="pre">None</span></code>, this
-will always default to <code class="docutils literal"><span class="pre">OrderSignal.out</span></code></p>
-<p>Examples:</p>
-<blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
-<span class="go">&lt;OrderSignal.buy...&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
-<span class="go">&lt;OrderSignal.sell...&gt;</span>
-</pre></div>
-</div>
-<p>When signal is <code class="docutils literal"><span class="pre">None</span></code>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
-<span class="go">&lt;OrderSignal.out...&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span><span class="o">.</span><span class="n">signal</span>
-<span class="go">&lt;OrderSignal.out...&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
-<span class="go">&lt;OrderSignal.out...&gt;</span>
-</pre></div>
-</div>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="order-signal">
-<h2>Order Signal<a class="headerlink" href="#order-signal" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="mt_remote.OrderSignal">
-<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">OrderSignal</code><a class="headerlink" href="#mt_remote.OrderSignal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Order signal to send to MT for fulfillment</p>
-<dl class="attribute">
-<dt id="mt_remote.OrderSignal.buy">
-<code class="descname">buy</code><em class="property"> = &lt;OrderSignal.buy: 'buy'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.buy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.OrderSignal.out">
-<code class="descname">out</code><em class="property"> = &lt;OrderSignal.out: 'out'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.out" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.OrderSignal.sell">
-<code class="descname">sell</code><em class="property"> = &lt;OrderSignal.sell: 'sell'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.sell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="bar">
 <h2>Bar<a class="headerlink" href="#bar" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1113,50 +818,6 @@ representing what the unit of the value is</p>
 </dd></dl>
 
 </div>
-<div class="section" id="bar-period">
-<h2>Bar Period<a class="headerlink" href="#bar-period" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="mt_remote.BarPeriod">
-<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">BarPeriod</code><a class="headerlink" href="#mt_remote.BarPeriod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Units for a <code class="docutils literal"><span class="pre">Bar</span></code> period</p>
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.days">
-<code class="descname">days</code><em class="property"> = &lt;BarPeriod.days: 'days'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.days" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.hours">
-<code class="descname">hours</code><em class="property"> = &lt;BarPeriod.hours: 'hours'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.hours" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.minutes">
-<code class="descname">minutes</code><em class="property"> = &lt;BarPeriod.minutes: 'minutes'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.minutes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.months">
-<code class="descname">months</code><em class="property"> = &lt;BarPeriod.months: 'months'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.months" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.seconds">
-<code class="descname">seconds</code><em class="property"> = &lt;BarPeriod.seconds: 'seconds'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.seconds" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.weeks">
-<code class="descname">weeks</code><em class="property"> = &lt;BarPeriod.weeks: 'weeks'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.weeks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mt_remote.BarPeriod.years">
-<code class="descname">years</code><em class="property"> = &lt;BarPeriod.years: 'years'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.years" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="tick">
 <h2>Tick<a class="headerlink" href="#tick" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1214,6 +875,341 @@ representing what the unit of the value is</p>
 <p>Examples:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tick</span><span class="p">(</span><span class="n">tick_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01 12:22:22&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tick_ts</span>
 <span class="go">datetime.datetime(2016, 1, 1, 12, 22, 22, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="order">
+<h2>Order<a class="headerlink" href="#order" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Order">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Order</code><span class="sig-paren">(</span><em>signal=None</em>, <em>volume=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic order to place with MT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>signal</strong> (<a class="reference internal" href="#mt_remote.OrderSignal" title="mt_remote.OrderSignal"><em>OrderSignal</em></a>) &#8211; type of order to place</li>
+<li><strong>volume</strong> (<em>int</em>) &#8211; amount the order should trade</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; If <code class="docutils literal"><span class="pre">signal</span></code> isn&#8217;t out, and volume isn&#8217;t set</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span>
+<span class="go">&lt;Order: signal=out&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+<span class="go">&lt;Order: signal=out&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Order: volume=1, signal=buy&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Order: volume=1, signal=sell&gt;</span>
+</pre></div>
+</div>
+<p>Exceptions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders other than &#39;out&#39; must have volume</span>
+</pre></div>
+</div>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Orders of type &#39;out&#39; must not have volume</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="mt_remote.Order.signal">
+<code class="descname">signal</code><a class="headerlink" href="#mt_remote.Order.signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of order to place. In case this is set to <code class="docutils literal"><span class="pre">None</span></code>, this
+will always default to <code class="docutils literal"><span class="pre">OrderSignal.out</span></code></p>
+<p>Examples:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.buy...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.sell...&gt;</span>
+</pre></div>
+</div>
+<p>When signal is <code class="docutils literal"><span class="pre">None</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Order</span><span class="p">()</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">order</span><span class="o">.</span><span class="n">signal</span>
+<span class="go">&lt;OrderSignal.out...&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="order-signal">
+<h2>Order Signal<a class="headerlink" href="#order-signal" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.OrderSignal">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">OrderSignal</code><a class="headerlink" href="#mt_remote.OrderSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order signal to send to MT for fulfillment</p>
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.buy">
+<code class="descname">buy</code><em class="property"> = &lt;OrderSignal.buy: 'buy'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.buy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.out">
+<code class="descname">out</code><em class="property"> = &lt;OrderSignal.out: 'out'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.out" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.OrderSignal.sell">
+<code class="descname">sell</code><em class="property"> = &lt;OrderSignal.sell: 'sell'&gt;</em><a class="headerlink" href="#mt_remote.OrderSignal.sell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="bar-period">
+<h2>Bar Period<a class="headerlink" href="#bar-period" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.BarPeriod">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">BarPeriod</code><a class="headerlink" href="#mt_remote.BarPeriod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Units for a <code class="docutils literal"><span class="pre">Bar</span></code> period</p>
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.days">
+<code class="descname">days</code><em class="property"> = &lt;BarPeriod.days: 'days'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.days" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.hours">
+<code class="descname">hours</code><em class="property"> = &lt;BarPeriod.hours: 'hours'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.hours" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.minutes">
+<code class="descname">minutes</code><em class="property"> = &lt;BarPeriod.minutes: 'minutes'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.minutes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.months">
+<code class="descname">months</code><em class="property"> = &lt;BarPeriod.months: 'months'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.months" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.seconds">
+<code class="descname">seconds</code><em class="property"> = &lt;BarPeriod.seconds: 'seconds'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.seconds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.weeks">
+<code class="descname">weeks</code><em class="property"> = &lt;BarPeriod.weeks: 'weeks'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.weeks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mt_remote.BarPeriod.years">
+<code class="descname">years</code><em class="property"> = &lt;BarPeriod.years: 'years'&gt;</em><a class="headerlink" href="#mt_remote.BarPeriod.years" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="promise">
+<h2>Promise<a class="headerlink" href="#promise" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.Promise">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">Promise</code><a class="headerlink" href="#mt_remote.Promise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roughly mimick the promise pattern for async actions</p>
+<dl class="method">
+<dt id="mt_remote.Promise.accept">
+<code class="descname">accept</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Successfully complete</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.always">
+<code class="descname">always</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.always" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add success handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;then&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">then test</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">always</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;catch&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">catch test</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">always</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.catch">
+<code class="descname">catch</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.catch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add failure handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">catch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.reject">
+<code class="descname">reject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.reject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error trying to complete</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>AssertionError</strong> &#8211; if already completed</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AssertionError</span>: <span class="n">Can&#39;t complete multiple times</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mt_remote.Promise.then">
+<code class="descname">then</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.Promise.then" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add success handler</p>
+<p>Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">1 test</span>
+<span class="go">2 test</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="go">3 test</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span> <span class="o">=</span> <span class="n">Promise</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prom</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="s1">&#39;nothing&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
