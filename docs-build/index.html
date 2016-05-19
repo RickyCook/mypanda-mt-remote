@@ -168,6 +168,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.order</span> <span class="k">import</span> <span class="n">Order</span>
 </pre></div>
 </div>
+<p>The <code class="docutils literal"><span class="pre">on_bar</span></code> decorator marks a function to receive every bar in the
+CSV file:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source_1</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
 <span class="gp">... </span><span class="s1">2016-01-01T12:00:00,10,12,9,11,1000</span>
 <span class="gp">... </span><span class="s1">2016-01-01T12:10:00,11,13,10,12,1001</span>
@@ -177,9 +179,9 @@
 <span class="gp">... </span><span class="k">def</span> <span class="nf">bar_handler_1</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source_1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="go">&lt;Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00:00...&gt;</span>
-<span class="go">&lt;Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10:00...&gt;</span>
-<span class="go">&lt;Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20:00...&gt;</span>
+<span class="go">&lt;Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00...&gt;</span>
+<span class="go">&lt;Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10...&gt;</span>
+<span class="go">&lt;Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20...&gt;</span>
 </pre></div>
 </div>
 <p>Trading example:</p>
