@@ -517,6 +517,89 @@ tick and bar:</p>
 </div></blockquote>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="mt_remote.CsvEventSource.balance_total">
+<code class="descname">balance_total</code><a class="headerlink" href="#mt_remote.CsvEventSource.balance_total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total account value including both balance, and open trades</p>
+<p>Examples:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.order</span> <span class="k">import</span> <span class="n">Order</span>
+</pre></div>
+</div>
+<p>Balance total is the same as balance if no trades in place:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1000.0</span>
+</pre></div>
+</div>
+<p>Total doesn&#8217;t change just because of a tick:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_tick</span><span class="p">(</span><span class="n">Tick</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1000.0</span>
+</pre></div>
+</div>
+<p>Total doesn&#8217;t change just because of a bar:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">20.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1000.0</span>
+</pre></div>
+</div>
+<p>Placing a buy order updates balance, but total remains the same:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">buy</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">20.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1000.0</span>
+</pre></div>
+</div>
+<p>If the trade goes well, total increases (balance remains fixed):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">30.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1030.0</span>
+</pre></div>
+</div>
+<p>If the trade goes badly, total decreases (balance remains fixed):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">970.0</span>
+</pre></div>
+</div>
+<p>Placing a sell order updates balance, but total remains the same:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">CsvEventSource</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">OrderSignal</span><span class="o">.</span><span class="n">sell</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;mt_remote.promise.Promise...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">20.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1000.0</span>
+</pre></div>
+</div>
+<p>If the trade goes well, total increases (balance remains fixed):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">1030.0</span>
+</pre></div>
+</div>
+<p>If the trade goes badly, total decreases (balance remains fixed):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">_add_bar</span><span class="p">(</span><span class="n">Bar</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="mf">30.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance</span>
+<span class="go">940.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">balance_total</span>
+<span class="go">970.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
 </dd></dl>
 
 </div>
