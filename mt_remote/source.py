@@ -228,18 +228,21 @@ class CsvEventSource(BaseEventSource):
         >>> from io import StringIO
         >>> from .order import Order
 
-      >>> source_1 = CsvEventSource(handle=StringIO('''
-      ... 2016-01-01T12:00:00,10,12,9,11,1000
-      ... 2016-01-01T12:10:00,11,13,10,12,1001
-      ... 2016-01-01T12:20:00,12,13,11,13,1002
-      ... '''))
-      >>> @source_1.on_bar
-      ... def bar_handler_1(bar):
-      ...     print(bar)
-      >>> source_1.start()
-      <Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00:00...>
-      <Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10:00...>
-      <Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20:00...>
+      The ``on_bar`` decorator marks a function to receive every bar in the
+      CSV file:
+
+        >>> source_1 = CsvEventSource(handle=StringIO('''
+        ... 2016-01-01T12:00:00,10,12,9,11,1000
+        ... 2016-01-01T12:10:00,11,13,10,12,1001
+        ... 2016-01-01T12:20:00,12,13,11,13,1002
+        ... '''))
+        >>> @source_1.on_bar
+        ... def bar_handler_1(bar):
+        ...     print(bar)
+        >>> source_1.start()
+        <Bar: o...10.0, h...12.0, l...9.0, c...11.0, v...1000, s...12:00...>
+        <Bar: o...11.0, h...13.0, l...10.0, c...12.0, v...1001, s...12:10...>
+        <Bar: o...12.0, h...13.0, l...11.0, c...13.0, v...1002, s...12:20...>
 
       Trading example:
 
@@ -540,6 +543,95 @@ class CsvEventSource(BaseEventSource):
         """ Set the internal balance value, ensuring float """
         self.__balance = float(value)
 
+    @property
+    def balance_total(self):
+        """ Total account value including both balance, and open trades
+
+        Examples:
+
+          >>> from .order import Order
+
+          Balance total is the same as balance if no trades in place:
+
+            >>> source = CsvEventSource(path='', balance=1000)
+            >>> source.balance_total
+            1000.0
+
+          Total doesn't change just because of a tick:
+
+            >>> source._add_tick(Tick(price=10.0))
+            >>> source.balance_total
+            1000.0
+
+          Total doesn't change just because of a bar:
+
+            >>> source._add_bar(Bar(close=20.0))
+            >>> source.balance_total
+            1000.0
+
+          Placing a buy order updates balance, but total remains the same:
+
+            >>> source.update_order(Order(signal=OrderSignal.buy, volume=3))
+            <mt_remote.promise.Promise...>
+            >>> source._add_bar(Bar(close=20.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            1000.0
+
+          If the trade goes well, total increases (balance remains fixed):
+
+            >>> source._add_bar(Bar(close=30.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            1030.0
+
+          If the trade goes badly, total decreases (balance remains fixed):
+
+            >>> source._add_bar(Bar(close=10.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            970.0
+
+          Placing a sell order updates balance, but total remains the same:
+
+            >>> source = CsvEventSource(path='', balance=1000)
+            >>> source.update_order(Order(signal=OrderSignal.sell, volume=3))
+            <mt_remote.promise.Promise...>
+            >>> source._add_bar(Bar(close=20.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            1000.0
+
+          If the trade goes well, total increases (balance remains fixed):
+
+            >>> source._add_bar(Bar(close=10.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            1030.0
+
+          If the trade goes badly, total decreases (balance remains fixed):
+
+            >>> source._add_bar(Bar(close=30.0))
+            >>> source.balance
+            940.0
+            >>> source.balance_total
+            970.0
+
+        """
+        if self._curr_order is None:
+            return self.balance
+
+        return self.balance + self._curr_order.volume * order_single(
+            self._curr_order.signal,
+            self._curr_order_price,
+            self._price,
+        )
+
     def start(self):
         """ Open and read the CSV file, sending events for each row """
         if self._handle is not None:
@@ -758,21 +850,18 @@ class CsvEventSource(BaseEventSource):
 
     def _fulfill_order_out(self, clear_order=True):
         """ Fulfill an order for out """
-        if self._curr_order_price is None:
+        if self._curr_order is None:
             self.order_promise.reject("No open order")
+            return
 
-        order_total = self._curr_order.volume * order_single(
-            self._curr_order.signal,
-            self._curr_order_price,
-            self._price,
-        )
+        balance_total = self.balance_total
 
         if clear_order:
             self._curr_order = None
             self._curr_order_price = None
 
         # TODO Wait for next signal to update balance
-        self._update_balance(self.balance + order_total)
+        self._update_balance(balance_total)
 
     def _fulfill_order_in(self):
         """ Fulfill an order for buy/sell """
