@@ -8,7 +8,7 @@ CSV Event Source
 ----------------
 
 .. autoclass:: CsvEventSource
-   :members: _fulfill_order
+   :members: _fulfill_order, balance_total
 
 Bar
 ---
