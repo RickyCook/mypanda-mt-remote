@@ -5,7 +5,7 @@ from pip.req import parse_requirements
 
 install_reqs = parse_requirements('requirements.txt', session=False)
 
-setup(name="MT Remote",
+setup(name="mypanda-mt-remote",
       version="0.0.1",
       description="MetaTrader remote interface",
       author="Ricky Cook",
