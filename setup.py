@@ -11,6 +11,6 @@ setup(name="mypanda-mt-remote",
       author="Ricky Cook",
       author_email="mt_remote@auto.thatpanda.com",
       url="https://github.com/RickyCook/mt_remote",
-      py_modules=['mt_remote'],
+      packages=['mt_remote'],
       install_requires=[str(ir.req) for ir in install_reqs],
 )
