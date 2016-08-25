@@ -213,7 +213,7 @@ class MtEventSource(BaseEventSource):
         >>> client = source.APP.test_client()
 
         >>> from functools import partial
-        >>> from .order import Order
+        >>> from .order import Order, OrderSignal
 
       Setup for simple handlers:
 
@@ -235,7 +235,6 @@ class MtEventSource(BaseEventSource):
 
         >>> response.status_code
         201
-
 
       Gets bars:
 
@@ -292,6 +291,40 @@ class MtEventSource(BaseEventSource):
 
         >>> client.get('/report?type=badtype').status_code
         400
+
+      Body is blank when no RPC is queued:
+
+        >>> client.post('/report').data
+        b''
+
+      Order RPC text sent as body in error:
+
+        >>> promise = source.update_order(
+        ...   Order())
+        >>> client.post('/report?type=badtype').data
+        b'ORDER,out,'
+
+        >>> promise.reject()
+
+      Order RPC text sent as body in health check:
+
+        >>> promise = source.update_order(
+        ...   Order(signal=OrderSignal.buy, volume=10))
+        >>> client.post('/report').data
+        b'ORDER,buy,10'
+
+        >>> promise.reject()
+
+      Order sent only once:
+
+        >>> promise = source.update_order(
+        ...   Order(signal=OrderSignal.buy, volume=10))
+        >>> client.post('/report').data
+        b'ORDER,buy,10'
+        >>> client.post('/report').data
+        b''
+
+        >>> promise.reject()
     """
 
     def __init__(self):
@@ -319,7 +352,17 @@ class MtEventSource(BaseEventSource):
             else:
                 status_code = 400
 
-            return '', status_code
+            return self._rpc_text(), status_code
+
+    def _rpc_text(self):
+        """ Get the RPC text to send to MetaTrader """
+        if self.order_in_progress and not self._order_sent:
+            self._order_sent = True
+            return 'ORDER,{signal},{volume}'.format(
+                signal=self.order.signal.value,
+                volume=self.order.volume or '',
+            )
+        return ''
 
     def _report_bar(self):
         """ Parse request as bar report """
