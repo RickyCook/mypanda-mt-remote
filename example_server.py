@@ -22,15 +22,19 @@ def bar_handler(bar):
         if bar.close > bar.open:
             logging.info("Placing BUY because close (%s) > open (%s)",
                          bar.close, bar.open)
-            source.update_order(Order(signal=OrderSignal.buy, volume=2))
+            promise = source.update_order(Order(signal=OrderSignal.buy, volume=2))
         elif bar.close < bar.open:
             logging.info("Placing SELL because close (%s) < open (%s)",
                          bar.close, bar.open)
-            source.update_order(Order(signal=OrderSignal.sell, volume=2))
+            promise = source.update_order(Order(signal=OrderSignal.sell, volume=2))
         else:
             logging.info("Closing trades because close (%s) = open (%s)",
                          bar.close, bar.open)
-            source.update_order(Order())
+            promise = source.update_order(Order())
+
+        promise.\
+            then(partial(logging.info, 'Trade opened')).\
+            catch(partial(logging.error, 'Trade failed'))
 
 
 @source.on_tick
