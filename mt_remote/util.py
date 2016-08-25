@@ -1,5 +1,6 @@
 """ Utils for MT Remote """
 import datetime
+import re
 
 from functools import wraps
 
@@ -56,8 +57,22 @@ def repr_str(obj, attrs, update=None):
     )
 
 
+TS_SETTER_NUM_RE = r'(?P<{name}>[0-9]+)'
+TS_SETTER_TRANSFORM_RE = re.compile(
+    r'^{year}{sep}{month}{sep}{day}'.format(
+        sep=r'[./]',
+        year=TS_SETTER_NUM_RE.format(name='Y'),
+        month=TS_SETTER_NUM_RE.format(name='M'),
+        day=TS_SETTER_NUM_RE.format(name='D'),
+    )
+)
+TS_SETTER_TRANSFORM_REPL = r'\g<Y>-\g<M>-\g<D>'
+
+
 def ts_setter(func):
-    """ Decorator for setters that parses ISO8601 automatically
+    """ Decorator for setters that parses ISO8601 (and ISO8601-like)
+    automatically
+
     :param value: Pre-parsed, or ISO8601 string date
     :type value: None, datetime.datetime, str
 
@@ -72,6 +87,9 @@ def ts_setter(func):
 
       >>> mysetter(self_, '2016-01-01T12:22:22')
       V: 2016-01-01 12:22:22+00:00
+
+      >>> mysetter(self_, '2016.01.02 03:04:05')
+      V: 2016-01-02 03:04:05+00:00
 
       >>> mysetter(self_, None)
       V: None
@@ -93,6 +111,7 @@ def ts_setter(func):
         elif isinstance(value, datetime.datetime):
             return func(self, value)
         else:
+            value = TS_SETTER_TRANSFORM_RE.sub(TS_SETTER_TRANSFORM_REPL, value)
             return func(self, iso8601.parse_date(value))
 
     return inner

@@ -68,10 +68,18 @@ class Bar(object):
           >>> Bar(open_='12')
           <Bar: open=12.0>
 
-          Start timestamp is parsed:
+          Start timestamp is parsed in format from MetaTrader CSV:
 
             >>> Bar(start_ts='2016-01-01').start_ts
             datetime.datetime(2016, 1, 1, 0, 0, tzinfo=<iso8601.Utc>)
+
+            >>> Bar(start_ts='2016-01-02 03:04:05').start_ts
+            datetime.datetime(2016, 1, 2, 3, 4, 5, tzinfo=<iso8601.Utc>)
+
+          Start timestamp parsed in format from MetaTrader Time[] array
+
+            >>> Bar(start_ts='2016.01.02 03:04:05').start_ts
+            datetime.datetime(2016, 1, 2, 3, 4, 5, tzinfo=<iso8601.Utc>)
 
           Blanks are considered None:
 

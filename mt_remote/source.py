@@ -1,6 +1,8 @@
 """ Event sources that give ticks, bars, and fulfill orders """
 import csv
 
+from flask import Flask, request
+
 from .bar import Bar
 from .exceptions import OrderQueueError
 from .order import OrderSignal
@@ -198,11 +200,103 @@ class BaseEventSource(object):
         raise NotImplementedError("Must override start")
 
 
-# class MtEventSource(BaseEventSource):
-#     """ An event source that gets ``Bar`` data from a live MetaTrader server,
-#     and places orders to the same live server
-#     """
-#     pass
+class MtEventSource(BaseEventSource):
+    """ An event source that gets data, and fills commands on a live MetaTrader
+    client
+
+    Examples:
+
+      Setup:
+
+        >>> source = MtEventSource()
+        >>> source.APP.config['TESTING'] = True
+        >>> client = source.APP.test_client()
+
+      Setup for simple handlers:
+
+        >>> @source.on_tick
+        ... def handle_tick(tick):
+        ...   print('TICK:', tick)
+
+        >>> @source.on_bar
+        ... def handle_bar(bar):
+        ...   print('BAR:', bar)
+
+      Gets ticks:
+
+        >>> response = client.post('/report?type=tick', data={
+        ...   'tick_ts': '2016.01.02 03:02:00',
+        ...   'price': 1.2345,
+        ... })
+        TICK: <Tick: price=1.2345, tick_ts=2016-01-02T03:02:00+00:00>
+
+        >>> assert response.status_code == 201
+
+
+      Gets bars:
+
+        >>> response = client.post('/report?type=bar', data={
+        ...   'start_ts': '2016.01.02 03:02:00',
+        ...   'open_': 1.2345,
+        ...   'high': 2.3456,
+        ...   'low': 0.1234,
+        ...   'close': 1.2468,
+        ...   'volume': 20,
+        ... })
+        BAR: <Bar: open=1.2345, high=2.3456, low=0.1234, close=1.2468, volume=20, start_ts=2016-01-02T03:02:00+00:00>
+
+        >>> assert response.status_code == 201
+
+      No report type is a connection check for MetaTrader init:
+
+        >>> client.get('/report').status_code
+        200
+    """
+
+    def __init__(self):
+        super(MtEventSource, self).__init__()
+        self.APP = Flask(__name__)
+
+        @self.APP.route('/report', methods=['GET', 'POST'])
+        def report():
+            """ All-in-one URL for information from MetaTrader """
+            report_type = request.args.get('type', None)
+
+            if report_type == 'bar':
+                self._add_bar(
+                    Bar(**{
+                        key: request.form.get(key, None)
+                        for key in (
+                            'start_ts',
+                            'open_',
+                            'high',
+                            'low',
+                            'close',
+                            'volume',
+                        )
+                    })
+                )
+                return 'Reported', 201
+
+            elif report_type == 'tick':
+                tick = Tick(**{
+                    key: request.form.get(key, None)
+                    for key in (
+                        'tick_ts',
+                        'price',
+                    )
+                })
+                self._add_tick(tick)
+                return 'Reported', 201
+
+            elif report_type == None:
+                return 'Connected', 200
+
+            return 'Invalid type', 400
+
+    def start(self):
+        """ Start the server for MetaTrader to connect to """
+        self.APP.run(host='0.0.0.0', port=80)
 
 
 DEFAULT_CSV_COLS = ('start_ts', 'open_', 'high', 'low', 'close', 'volume')
