@@ -230,7 +230,8 @@ class MtEventSource(BaseEventSource):
         ... })
         TICK: <Tick: price=1.2345, tick_ts=2016-01-02T03:02:00+00:00>
 
-        >>> assert response.status_code == 201
+        >>> response.status_code
+        201
 
 
       Gets bars:
@@ -245,7 +246,8 @@ class MtEventSource(BaseEventSource):
         ... })
         BAR: <Bar: open=1.2345, high=2.3456, low=0.1234, close=1.2468, volume=20, start_ts=2016-01-02T03:02:00+00:00>
 
-        >>> assert response.status_code == 201
+        >>> response.status_code
+        201
 
       No report type is a connection check for MetaTrader init:
 
