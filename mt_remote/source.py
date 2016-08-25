@@ -296,6 +296,7 @@ class MtEventSource(BaseEventSource):
 
     def __init__(self):
         super(MtEventSource, self).__init__()
+        self._order_sent = False
         self.APP = Flask(__name__)
 
         @self.APP.route('/report', methods=['GET', 'POST'])
@@ -360,6 +361,44 @@ class MtEventSource(BaseEventSource):
             return 200
 
         return 400
+
+    def update_order(self, order):
+        """ In addition to updating the order, clear the flag that says we have sent this new order
+
+        Examples:
+
+          Setup:
+
+            >>> from .order import Order
+
+          Order sent flag is set to False:
+
+            >>> source = MtEventSource()
+            >>> source._order_sent = True
+
+            >>> source.update_order(Order())
+            <mt_remote.promise.Promise...>
+            >>> source._order_sent
+            False
+
+          Order sent flag not changed unless order is actually queued:
+
+            >>> source = MtEventSource()
+
+            >>> source.update_order(Order())
+            <mt_remote.promise.Promise...>
+            >>> source._order_sent = True
+            >>> source.update_order(Order())
+            Traceback (most recent call last):
+            ...
+            mt_remote.exceptions.OrderQueueError: Order already being fulfilled
+            >>> source._order_sent
+            True
+
+        """
+        promise = super(MtEventSource, self).update_order(order)
+        self._order_sent = False
+        return promise
 
     def start(self):
         """ Start the server for MetaTrader to connect to """
