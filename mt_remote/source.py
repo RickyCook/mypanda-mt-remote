@@ -1,5 +1,6 @@
 """ Event sources that give ticks, bars, and fulfill orders """
 import csv
+import logging
 
 from flask import Flask, request
 
@@ -350,6 +351,7 @@ class MtEventSource(BaseEventSource):
                 status_code = 200
 
             else:
+                logging.error("Invalid report type '%s'", report_type)
                 status_code = 400
 
             return self._rpc_text(), status_code
@@ -403,6 +405,7 @@ class MtEventSource(BaseEventSource):
             self.order_promise.reject()
             return 200
 
+        logging.error("Invalid order status '%s'", status)
         return 400
 
     def update_order(self, order):
