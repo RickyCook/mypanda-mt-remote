@@ -10,6 +10,12 @@ CSV Event Source
 .. autoclass:: CsvEventSource
    :members: _fulfill_order, balance_total
 
+MetaTrader Event Source
+-----------------------
+
+.. autoclass:: MtEventSource
+   :members: start
+
 Bar
 ---
 

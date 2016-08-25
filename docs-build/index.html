@@ -79,6 +79,7 @@
                 <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">API</a><ul>
 <li><a class="reference internal" href="#csv-event-source">CSV Event Source</a></li>
+<li><a class="reference internal" href="#metatrader-event-source">MetaTrader Event Source</a></li>
 <li><a class="reference internal" href="#bar">Bar</a></li>
 <li><a class="reference internal" href="#tick">Tick</a></li>
 <li><a class="reference internal" href="#order">Order</a></li>
@@ -598,6 +599,73 @@ tick and bar:</p>
 </pre></div>
 </div>
 </div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="metatrader-event-source">
+<h2>MetaTrader Event Source<a class="headerlink" href="#metatrader-event-source" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mt_remote.MtEventSource">
+<em class="property">class </em><code class="descclassname">mt_remote.</code><code class="descname">MtEventSource</code><a class="headerlink" href="#mt_remote.MtEventSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>An event source that gets data, and fills commands on a live MetaTrader
+client</p>
+<p>Examples:</p>
+<blockquote>
+<div><p>Setup:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">MtEventSource</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;TESTING&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">test_client</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Setup for simple handlers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source</span><span class="o">.</span><span class="n">on_tick</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">handle_tick</span><span class="p">(</span><span class="n">tick</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TICK:&#39;</span><span class="p">,</span> <span class="n">tick</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@source</span><span class="o">.</span><span class="n">on_bar</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">handle_bar</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;BAR:&#39;</span><span class="p">,</span> <span class="n">bar</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Gets ticks:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/report?type=tick&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>  <span class="s1">&#39;tick_ts&#39;</span><span class="p">:</span> <span class="s1">&#39;2016.01.02 03:02:00&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">1.2345</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="go">TICK: &lt;Tick: price=1.2345, tick_ts=2016-01-02T03:02:00+00:00&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+</pre></div>
+</div>
+<p>Gets bars:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/report?type=bar&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>  <span class="s1">&#39;start_ts&#39;</span><span class="p">:</span> <span class="s1">&#39;2016.01.02 03:02:00&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;open_&#39;</span><span class="p">:</span> <span class="mf">1.2345</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;high&#39;</span><span class="p">:</span> <span class="mf">2.3456</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;low&#39;</span><span class="p">:</span> <span class="mf">0.1234</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;close&#39;</span><span class="p">:</span> <span class="mf">1.2468</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="s1">&#39;volume&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="go">BAR: &lt;Bar: open=1.2345, high=2.3456, low=0.1234, close=1.2468, volume=20, start_ts=2016-01-02T03:02:00+00:00&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+</pre></div>
+</div>
+<p>No report type is a connection check for MetaTrader init:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/report&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
+<span class="go">200</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="method">
+<dt id="mt_remote.MtEventSource.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mt_remote.MtEventSource.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the server for MetaTrader to connect to</p>
 </dd></dl>
 
 </dd></dl>
