@@ -8,7 +8,7 @@
 #define ORDER_SLIPPAGE   3
 #define ORDER_STOPLOSS   20
 #define ORDER_TAKEPROFIT 20
-#define SERVER_URL       "http://192.168.251.1/report"
+#define SERVER_URL       "http://127.0.0.1/report"
 
 #define BAR_URL          SERVER_URL + "?type=bar"
 #define TICK_URL         SERVER_URL + "?type=tick"
