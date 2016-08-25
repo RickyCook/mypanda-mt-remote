@@ -212,6 +212,9 @@ class MtEventSource(BaseEventSource):
         >>> source.APP.config['TESTING'] = True
         >>> client = source.APP.test_client()
 
+        >>> from functools import partial
+        >>> from .order import Order
+
       Setup for simple handlers:
 
         >>> @source.on_tick
@@ -249,6 +252,37 @@ class MtEventSource(BaseEventSource):
         >>> response.status_code
         201
 
+      Report order status success:
+
+        >>> promise = source.update_order(Order()).then(partial(print, 'OK'))
+
+        >>> response = client.post('/report?type=order', data={
+        ...   'status': 'success',
+        ... })
+        OK
+
+        >>> response.status_code
+        200
+
+      Report order status error:
+
+        >>> promise = source.update_order(Order()).catch(partial(print, 'ERROR'))
+
+        >>> response = client.post('/report?type=order', data={
+        ...   'status': 'error',
+        ... })
+        ERROR
+
+        >>> response.status_code
+        200
+
+      Invalid order status gives status 400:
+
+        >>> client.post('/report?type=order', data={
+        ...   'status': 'badstatus',
+        ... }).status_code
+        400
+
       No report type is a connection check for MetaTrader init:
 
         >>> client.get('/report').status_code
@@ -270,36 +304,62 @@ class MtEventSource(BaseEventSource):
             report_type = request.args.get('type', None)
 
             if report_type == 'bar':
-                self._add_bar(
-                    Bar(**{
-                        key: request.form.get(key, None)
-                        for key in (
-                            'start_ts',
-                            'open_',
-                            'high',
-                            'low',
-                            'close',
-                            'volume',
-                        )
-                    })
-                )
-                return 'Reported', 201
+                status_code = self._report_bar()
 
             elif report_type == 'tick':
-                tick = Tick(**{
-                    key: request.form.get(key, None)
-                    for key in (
-                        'tick_ts',
-                        'price',
-                    )
-                })
-                self._add_tick(tick)
-                return 'Reported', 201
+                status_code = self._report_tick()
+
+            elif report_type == 'order':
+                status_code = self._report_order()
 
             elif report_type == None:
-                return 'Connected', 200
+                status_code = 200
 
-            return 'Invalid type', 400
+            else:
+                status_code = 400
+
+            return '', status_code
+
+    def _report_bar(self):
+        """ Parse request as bar report """
+        self._add_bar(
+            Bar(**{
+                key: request.form.get(key, None)
+                for key in (
+                    'start_ts',
+                    'open_',
+                    'high',
+                    'low',
+                    'close',
+                    'volume',
+                )
+            })
+        )
+        return 201
+
+    def _report_tick(self):
+        """ Parse request as tick report """
+        tick = Tick(**{
+            key: request.form.get(key, None)
+            for key in (
+                'tick_ts',
+                'price',
+            )
+        })
+        self._add_tick(tick)
+        return 201
+
+    def _report_order(self):
+        """ Parse request as reporting the status of an in-progress order """
+        status = request.form['status']
+        if status == 'success':
+            self.order_promise.accept()
+            return 200
+        elif status == 'error':
+            self.order_promise.reject()
+            return 200
+
+        return 400
 
     def start(self):
         """ Start the server for MetaTrader to connect to """
