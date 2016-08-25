@@ -226,6 +226,10 @@ class MtEventSource(BaseEventSource):
         ... def handle_bar(bar):
         ...   print('BAR:', bar)
 
+        >>> @source.on_balance
+        ... def handle_balance(balance):
+        ...   print('BALANCE:', balance)
+
       Gets ticks:
 
         >>> response = client.post('/report?type=tick', data={
@@ -282,6 +286,16 @@ class MtEventSource(BaseEventSource):
         ...   'status': 'badstatus',
         ... }).status_code
         400
+
+      Report account balance:
+
+        >>> response = client.post('/report?type=balance', data={
+        ...   'account_balance': 222.11,
+        ... })
+        BALANCE: 222.11
+
+        >>> response.status_code
+        200
 
       No report type is a connection check for MetaTrader init:
 
@@ -347,6 +361,9 @@ class MtEventSource(BaseEventSource):
             elif report_type == 'order':
                 status_code = self._report_order()
 
+            elif report_type == 'balance':
+                status_code = self._report_balance()
+
             elif report_type == None:
                 status_code = 200
 
@@ -407,6 +424,11 @@ class MtEventSource(BaseEventSource):
 
         logging.error("Invalid order status '%s'", status)
         return 400
+
+    def _report_balance(self):
+        """ Parse request as reporting the account balance """
+        self._update_balance(request.form['account_balance'])
+        return 200
 
     def update_order(self, order):
         """ In addition to updating the order, clear the flag that says we have sent this new order
