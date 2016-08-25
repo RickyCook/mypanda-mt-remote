@@ -648,9 +648,18 @@ tick and bar:</p>
 <span class="go">&lt;Bar: open=12.0&gt;</span>
 </pre></div>
 </div>
-<p>Start timestamp is parsed:</p>
+<p>Start timestamp is parsed in format from MetaTrader CSV:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span>
 <span class="go">datetime.datetime(2016, 1, 1, 0, 0, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;2016-01-02 03:04:05&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span>
+<span class="go">datetime.datetime(2016, 1, 2, 3, 4, 5, tzinfo=&lt;iso8601.Utc&gt;)</span>
+</pre></div>
+</div>
+<p>Start timestamp parsed in format from MetaTrader Time[] array</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bar</span><span class="p">(</span><span class="n">start_ts</span><span class="o">=</span><span class="s1">&#39;2016.01.02 03:04:05&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">start_ts</span>
+<span class="go">datetime.datetime(2016, 1, 2, 3, 4, 5, tzinfo=&lt;iso8601.Utc&gt;)</span>
 </pre></div>
 </div>
 <p>Blanks are considered None:</p>
