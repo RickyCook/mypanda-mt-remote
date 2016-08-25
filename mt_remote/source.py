@@ -253,6 +253,11 @@ class MtEventSource(BaseEventSource):
 
         >>> client.get('/report').status_code
         200
+
+      Bad report type gives status 400:
+
+        >>> client.get('/report?type=badtype').status_code
+        400
     """
 
     def __init__(self):
