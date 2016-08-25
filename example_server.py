@@ -37,5 +37,11 @@ def bar_handler(bar):
 def tick_handler(tick):
     logging.debug("Got tick %s", tick)
 
+
+@source.on_balance
+def balance_handler(balance):
+    logging.debug("Got balance %s", balance)
+
+
 logging.basicConfig(level=logging.DEBUG)
 source.start()
